@@ -50,7 +50,6 @@ def axis_var(lagh, nug, nstruct, cc, vtype, a):
     # for each lag distance
     for j in range(0,n):
         c = nug
-        c = 0
         h = np.matrix(lagh[j])
         
         # for each structure in the variogram
@@ -96,7 +95,6 @@ def Rot_Mat(Azimuth, a_max, a_min):
     return Rot_Mat
 
 
-
 # covariance model
 def cov(h1, h2, k, vario):
     # unpack variogram parameters
@@ -108,7 +106,7 @@ def cov(h1, h2, k, vario):
     a_max = vario[5]
     a_min = vario[6]
     
-    c = -nug # nugget effect is made negative because we're calculating covariance instead of variance
+    c = nug 
     for i in range(nstruct):
         Q1 = h1.copy()
         Q2 = h2.copy()
@@ -136,9 +134,10 @@ def cov(h1, h2, k, vario):
                 ).sum(axis=1)
             )
             d = np.asarray(d).reshape(len(d))
-        c = c + covar(vtype[i], d, 1) * cc[i]
+        sill = np.sum(cc)+nug
+        gamma =  sill - covar(vtype[i], d, 1) * cc[i]
+        c =  sill-gamma
     return c
-
 
 # sequential Gaussian simulation
 def sgsim(Pred_grid, df, xx, yy, data, k, vario):
